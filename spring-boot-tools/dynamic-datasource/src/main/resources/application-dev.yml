@@ -1,0 +1,37 @@
+
+server:
+  port: 1010
+
+logging:
+  level:
+    com.oo: debug
+  config: classpath:logback-spring.xml
+
+spring:
+  datasource:
+      dynamic:
+        enabled: true
+      slaveList: slave
+      global:
+        pool:
+          validationTimeout: 1500
+          connection-timeout: 2000
+          idleTimeout: 60000  #空闲时间默认设置为600000毫秒（10分钟）。
+          max-lifetime: 600000  #最大的生命周期默认为1800000（30分钟）。
+          maximumPoolSize: 50
+          minimum-idle: 5
+          connection-test-query: SELECT 1
+      master:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: dev
+        url: jdbc:mysql://127.0.0.1:3306/lottery_01?useUnicode=true&characterEncoding=utf8
+        password: 1qaz@WSX
+        pool:
+          pool-name: master
+      slave:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: dev
+        url: jdbc:mysql://127.0.0.1:3306/lottery_01?useUnicode=true&characterEncoding=utf8
+        password: 1qaz@WSX
+        pool:
+          pool-name: slave
