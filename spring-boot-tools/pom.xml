@@ -18,6 +18,7 @@
 
     <modules>
         <module>dynamic-datasource</module>
+        <module>dynamic-sharding-router</module>
     </modules>
 
 

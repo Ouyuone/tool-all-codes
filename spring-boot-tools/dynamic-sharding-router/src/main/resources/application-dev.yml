@@ -1,0 +1,94 @@
+
+server:
+  port: 1010
+
+logging:
+  level:
+    com.oo: debug
+  config: classpath:logback-spring.xml
+
+spring:
+  datasource:
+      # 是否开启主从
+      dynamic-dbs: true
+      # 是否开启数据库分片
+      sharding-router: true
+      # 从库名称 不写默认slave
+      slaveList: slave
+      #全局配置
+      global:
+        pool:
+          validationTimeout: 1500
+          connection-timeout: 2000
+          idleTimeout: 60000  #空闲时间默认设置为600000毫秒（10分钟）。
+          max-lifetime: 600000  #最大的生命周期默认为1800000（30分钟）。
+          maximumPoolSize: 50
+          minimum-idle: 5
+          connection-test-query: SELECT 1
+      master:
+        # 是否开启数据库分片
+        sharding-router: true
+        # 分数据库数量
+        dbCount: 2
+        # 分表数量
+        tbCount: 4
+        # 分表键
+        routerKey: uId
+        # 默认数据库
+        default: db00
+        # 分表数据库列表
+        list: db01,db02
+        db00:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dev
+          url: jdbc:mysql://127.0.0.1:3306/lottery?useUnicode=true&characterEncoding=utf8
+          password: 1qaz@WSX
+          pool:
+            pool-name: master_lottery
+
+        db01:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dev
+          url: jdbc:mysql://127.0.0.1:3306/lottery_01?useUnicode=true&characterEncoding=utf8
+          password: 1qaz@WSX
+          pool:
+            pool-name: master_lottery01
+
+        db02:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dev
+          url: jdbc:mysql://127.0.0.1:3306/lottery_02?useUnicode=true&characterEncoding=utf8
+          password: 1qaz@WSX
+          pool:
+            pool-name: master_lottery02
+
+      slave:
+        sharding-router: true
+        dbCount: 2
+        tbCount: 4
+        routerKey: uId
+        default: db00
+        list: db01,db02
+        db00:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dev
+          url: jdbc:mysql://127.0.0.1:3306/lottery?useUnicode=true&characterEncoding=utf8
+          password: 1qaz@WSX
+          pool:
+            pool-name: slave_lottery
+
+        db01:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dev
+          url: jdbc:mysql://127.0.0.1:3306/lottery_01?useUnicode=true&characterEncoding=utf8
+          password: 1qaz@WSX
+          pool:
+            pool-name: slave_lottery01
+
+        db02:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dev
+          url: jdbc:mysql://127.0.0.1:3306/lottery_02?useUnicode=true&characterEncoding=utf8
+          password: 1qaz@WSX
+          pool:
+            pool-name: slave_lottery02

@@ -1,0 +1,11 @@
+server:
+  port: 1011
+spring:
+  profiles:
+    active: ${PROFILE_ACTIVE:dev}
+  application:
+    name: dynamic-sharding-router-application
+
+mybatis:
+  config-location: classpath:mybatis/config/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
