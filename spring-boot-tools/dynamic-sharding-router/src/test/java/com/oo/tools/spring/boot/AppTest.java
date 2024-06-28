@@ -22,8 +22,8 @@ public class AppTest {
      */
     @Test
     public void testApp() {
-     /*   testDao.queryList();
-        testDao.querySlaveList();*/
+//        testDao.queryList();
+        testDao.querySlaveList();
 
         testDao.querySharingList("5");
 

@@ -15,6 +15,8 @@ spring:
       sharding-router: true
       # 从库名称 不写默认slave
       slaveList: slave
+      #分片库前缀
+      sharing-db-key-prefix: db
       #全局配置
       global:
         pool:
@@ -63,32 +65,34 @@ spring:
             pool-name: master_lottery02
 
       slave:
-        sharding-router: true
-        dbCount: 2
-        tbCount: 4
-        routerKey: uId
-        default: db00
-        list: db01,db02
-        db00:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          username: dev
-          url: jdbc:mysql://127.0.0.1:3306/lottery?useUnicode=true&characterEncoding=utf8
-          password: 1qaz@WSX
-          pool:
-            pool-name: slave_lottery
-
-        db01:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          username: dev
-          url: jdbc:mysql://127.0.0.1:3306/lottery_01?useUnicode=true&characterEncoding=utf8
-          password: 1qaz@WSX
-          pool:
-            pool-name: slave_lottery01
-
-        db02:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          username: dev
-          url: jdbc:mysql://127.0.0.1:3306/lottery_02?useUnicode=true&characterEncoding=utf8
-          password: 1qaz@WSX
-          pool:
-            pool-name: slave_lottery02
+        sharding-router: false
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: dev
+        url: jdbc:mysql://127.0.0.1:3306/lottery?useUnicode=true&characterEncoding=utf8
+        password: 1qaz@WSX
+        pool:
+          pool-name: slave_lottery
+        #下面是分片的配置方法
+#        db00:
+#          driver-class-name: com.mysql.cj.jdbc.Driver
+#          username: dev
+#          url: jdbc:mysql://127.0.0.1:3306/lottery?useUnicode=true&characterEncoding=utf8
+#          password: 1qaz@WSX
+#          pool:
+#            pool-name: slave_lottery
+#
+#        db01:
+#          driver-class-name: com.mysql.cj.jdbc.Driver
+#          username: dev
+#          url: jdbc:mysql://127.0.0.1:3306/lottery_01?useUnicode=true&characterEncoding=utf8
+#          password: 1qaz@WSX
+#          pool:
+#            pool-name: slave_lottery01
+#
+#        db02:
+#          driver-class-name: com.mysql.cj.jdbc.Driver
+#          username: dev
+#          url: jdbc:mysql://127.0.0.1:3306/lottery_02?useUnicode=true&characterEncoding=utf8
+#          password: 1qaz@WSX
+#          pool:
+#            pool-name: slave_lottery02

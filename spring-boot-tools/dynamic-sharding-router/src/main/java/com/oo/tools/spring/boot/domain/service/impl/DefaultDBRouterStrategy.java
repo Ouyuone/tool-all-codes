@@ -21,8 +21,11 @@ public class DefaultDBRouterStrategy implements IDBRouterStrategy {
 
     private final Map<String, DBRouterConfig> dbRouterConfigMap;
 
-    public DefaultDBRouterStrategy(Map<String, DBRouterConfig> dbRouterConfigMap) {
+    private final Map<String, Boolean> shardingRouterMap;
+
+    public DefaultDBRouterStrategy(Map<String, DBRouterConfig> dbRouterConfigMap, Map<String, Boolean> shardingRouterMap) {
         this.dbRouterConfigMap = dbRouterConfigMap;
+        this.shardingRouterMap = shardingRouterMap;
     }
 
     @Value("${spring.datasource.sharing-db-key-prefix:db}")
@@ -36,7 +39,12 @@ public class DefaultDBRouterStrategy implements IDBRouterStrategy {
         if (StringUtils.isBlank(dbKeyAttr)) {
             logger.warn("dbKeyAttr is null, dynamicDBKey: {}", dynamicDBKey);
 
-            String dbKey = dbKeyMessageFormat.format(new Object[]{dynamicDBKey, sharingDBKeyPrefix, String.format("%02d", 00)});
+            String dbKey;
+            if (!shardingRouterMap.get(dynamicDBKey)) {
+                dbKey = dbKeyMessageFormat.format(new Object[]{dynamicDBKey, dynamicDBKey,""});
+            } else {
+                dbKey = dbKeyMessageFormat.format(new Object[]{dynamicDBKey, sharingDBKeyPrefix, String.format("%02d", 00)});
+            }
             DBContextHolder.setDBKey(dbKey);
             logger.debug("数据库路由 dbIdx：{} ", dbKey);
             return;

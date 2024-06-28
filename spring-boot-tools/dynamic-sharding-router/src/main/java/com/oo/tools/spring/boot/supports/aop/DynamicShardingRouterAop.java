@@ -34,9 +34,12 @@ public class DynamicShardingRouterAop {
 
     private final DefaultDBRouterStrategy dbRouterStrategy;
 
-    public DynamicShardingRouterAop(Map<String, DBRouterConfig> dbRouterConfigMap, DefaultDBRouterStrategy dbRouterStrategy) {
+    private final Map<String,Boolean> shardingRouterMap;
+
+    public DynamicShardingRouterAop(Map<String, DBRouterConfig> dbRouterConfigMap, DefaultDBRouterStrategy dbRouterStrategy,Map<String,Boolean> shardingRouterMap) {
         this.dbRouterConfigMap = dbRouterConfigMap;
         this.dbRouterStrategy = dbRouterStrategy;
+        this.shardingRouterMap = shardingRouterMap;
     }
 
     @Pointcut("@annotation(com.oo.tools.spring.boot.supports.annotation.DynamicSwitchRouter) || @within(com.oo.tools.spring.boot.supports.annotation.DynamicSwitchRouter)")
@@ -70,7 +73,8 @@ public class DynamicShardingRouterAop {
         //分片
         boolean splitTable = dynamicSwitchRouter.splitTable();
 
-        if (splitTable) {
+
+        if (shardingRouterMap.get(dynamicDBKey) && splitTable) {
 
             String routerKey = StringUtils.isBlank(dynamicSwitchRouter.routerKey()) ? dbRouterConfig.getRouterKey() : dynamicSwitchRouter.routerKey();
 

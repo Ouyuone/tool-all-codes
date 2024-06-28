@@ -79,12 +79,12 @@ public class DynamicDbsShardingRouterConfig implements EnvironmentAware {
 
     @Bean
     public DynamicShardingRouterAop dynamicShardingRouterAop() {
-        return new DynamicShardingRouterAop(routerConfig(),defaultDBRouterStrategy());
+        return new DynamicShardingRouterAop(routerConfig(), defaultDBRouterStrategy(),shardingRouterMap);
     }
 
     @Bean
     public DefaultDBRouterStrategy defaultDBRouterStrategy() {
-        return new DefaultDBRouterStrategy(routerConfig());
+        return new DefaultDBRouterStrategy(routerConfig(),shardingRouterMap);
     }
 
     @Bean
@@ -93,8 +93,12 @@ public class DynamicDbsShardingRouterConfig implements EnvironmentAware {
         Map<Object, Object> targetDataSources = new HashMap<>();
         for (String dynamicDBName : datasourceMap.keySet()) {
             Map<String, Map<String, Object>> stringMapMap = datasourceMap.get(dynamicDBName);
-            Pair<String, DataSource> dataSourcePair = doCreateDatasource(dynamicDBName, stringMapMap);
-            targetDataSources.put(dataSourcePair.getLeft(), dataSourcePair.getRight());
+
+            for (String shardingDBName : stringMapMap.keySet()) {
+                Map<String, Object> shardingDBMap = stringMapMap.get(shardingDBName);
+                DataSource dataSourcePair = doCreateDatasource(shardingDBMap);
+                targetDataSources.put(dynamicDBName + "." + shardingDBName, dataSourcePair);
+            }
         }
 
         DynamicShardingRouterDataSource shardingRouterService = new DynamicShardingRouterDataSource();
@@ -104,40 +108,37 @@ public class DynamicDbsShardingRouterConfig implements EnvironmentAware {
         return shardingRouterService;
     }
 
-    private static Pair<String, DataSource> doCreateDatasource(String dynamicDBName, Map<String, Map<String, Object>> stringMapMap) {
+    private static DataSource doCreateDatasource(Map<String, Object> shardingDBMap) {
         try {
-            for (String shardingDBName : stringMapMap.keySet()) {
-                Map<String, Object> shardingDBMap = stringMapMap.get(shardingDBName);
-                DataSourceProperties dataSourceProperties = new DataSourceProperties();
-                dataSourceProperties.setUrl(shardingDBMap.get("url").toString());
-                dataSourceProperties.setUsername(shardingDBMap.get("username").toString());
-                dataSourceProperties.setPassword(shardingDBMap.get("password").toString());
 
-                String driverClassName = shardingDBMap.get("driver-class-name") == null ? "com.zaxxer.hikari.HikariDataSource" : shardingDBMap.get("driver-class-name").toString();
-                dataSourceProperties.setDriverClassName(driverClassName);
+            DataSourceProperties dataSourceProperties = new DataSourceProperties();
+            dataSourceProperties.setUrl(shardingDBMap.get("url").toString());
+            dataSourceProperties.setUsername(shardingDBMap.get("username").toString());
+            dataSourceProperties.setPassword(shardingDBMap.get("password").toString());
 
-                String driverCLassType = shardingDBMap.get("driver-class-type") == null ? "com.zaxxer.hikari.HikariDataSource" : shardingDBMap.get("driver-class-type").toString();
+            String driverClassName = shardingDBMap.get("driver-class-name") == null ? "com.zaxxer.hikari.HikariDataSource" : shardingDBMap.get("driver-class-name").toString();
+            dataSourceProperties.setDriverClassName(driverClassName);
 
-                DataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().type((Class<? extends DataSource>) Class.forName(driverCLassType)).build();
+            String driverCLassType = shardingDBMap.get("driver-class-type") == null ? "com.zaxxer.hikari.HikariDataSource" : shardingDBMap.get("driver-class-type").toString();
 
-                MetaObject metaObject = SystemMetaObject.forObject(dataSource);
+            DataSource dataSource = dataSourceProperties.initializeDataSourceBuilder().type((Class<? extends DataSource>) Class.forName(driverCLassType)).build();
 
-                Map<String, Object> poolProps = (Map<String, Object>) (shardingDBMap.containsKey(TAG_POOL) ? shardingDBMap.get(TAG_POOL) : Collections.EMPTY_MAP);
+            MetaObject metaObject = SystemMetaObject.forObject(dataSource);
 
-                for (String poolPropKey : poolProps.keySet()) {
+            Map<String, Object> poolProps = (Map<String, Object>) (shardingDBMap.containsKey(TAG_POOL) ? shardingDBMap.get(TAG_POOL) : Collections.EMPTY_MAP);
 
-                    String poolProp = com.oo.tools.spring.boot.supports.StringUtils.middleScoreToCamelCase(poolPropKey);
-                    if (metaObject.hasSetter(poolProp)) {
-                        metaObject.setValue(poolProp, poolProps.get(poolPropKey));
-                    }
+            for (String poolPropKey : poolProps.keySet()) {
+
+                String poolProp = com.oo.tools.spring.boot.supports.StringUtils.middleScoreToCamelCase(poolPropKey);
+                if (metaObject.hasSetter(poolProp)) {
+                    metaObject.setValue(poolProp, poolProps.get(poolPropKey));
                 }
-                return Pair.of(dynamicDBName + "." + shardingDBName, dataSource);
-
             }
+            return dataSource;
+
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("can not find datasource type class by class name", e);
         }
-        return null;
     }
 
 
@@ -170,7 +171,7 @@ public class DynamicDbsShardingRouterConfig implements EnvironmentAware {
 
                 setDBRouterConfig(environment, slaveName, salveProperty);
 
-                if (salveProperty.get("sharding-router") instanceof Boolean) {
+                if (salveProperty.get("sharding-router") instanceof Boolean && (Boolean) salveProperty.get("sharding-router")) {
                     shardingRouterMap.put(slaveName, true);
                     setDefaultDB(environment, salveProperty, prefix, slaveName, globalProperty);
                     if (salveProperty.get("list") instanceof String list) {
@@ -197,7 +198,7 @@ public class DynamicDbsShardingRouterConfig implements EnvironmentAware {
             }
             setDBRouterConfig(environment, slaveName, salveProperty);
 
-            if (salveProperty.get("sharding-router") instanceof Boolean) {
+            if (salveProperty.get("sharding-router") instanceof Boolean && (Boolean) salveProperty.get("sharding-router")) {
                 shardingRouterMap.put(slaveName, true);
                 setDefaultDB(environment, salveProperty, prefix, slaveName, globalProperty);
                 if (salveProperty.get("list") instanceof String list) {
@@ -219,7 +220,7 @@ public class DynamicDbsShardingRouterConfig implements EnvironmentAware {
 
         setDBRouterConfig(environment, DynamicDatasourceLeveType.MASTER.getCode(), masterProperty);
 
-        if (masterProperty.get("sharding-router") instanceof Boolean) {
+        if (masterProperty.get("sharding-router") instanceof Boolean && (Boolean) masterProperty.get("sharding-router")) {
             shardingRouterMap.put(DynamicDatasourceLeveType.MASTER.getCode(), true);
             setDefaultDB(environment, masterProperty, prefix, DynamicDatasourceLeveType.MASTER.getCode(), globalProperty, true);
             if (masterProperty.get("list") instanceof String list) {
