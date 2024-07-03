@@ -12,6 +12,6 @@
     </select>
 
     <select id="querySharingList" resultType="com.oo.tools.spring.boot.domain.model.entity.TestEntity">
-        select * from user_strategy_export_${uId}
+        select * from user_strategy_export
     </select>
 </mapper>
