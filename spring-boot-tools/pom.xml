@@ -19,6 +19,7 @@
     <modules>
         <module>dynamic-datasource</module>
         <module>dynamic-sharding-router</module>
+        <module>knife4j-study</module>
     </modules>
 
 
