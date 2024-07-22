@@ -20,6 +20,7 @@
         <module>dynamic-datasource</module>
         <module>dynamic-sharding-router</module>
         <module>knife4j-study</module>
+        <module>beanloader-starter-spring-boot</module>
     </modules>
 
 
