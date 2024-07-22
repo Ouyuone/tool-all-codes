@@ -1,3 +1,5 @@
 
 
 /spring-boot-tools/**/target
+.idea
+.DS_Store
