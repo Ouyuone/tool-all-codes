@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 全局参数 -->
+    <settings>
+        <!-- 使全局的映射器启用或禁用缓存 -->
+        <setting name="cacheEnabled" value="true"/>
+        <!-- 允许JDBC 支持自动生成主键 -->
+        <setting name="useGeneratedKeys" value="true"/>
+        <!--
+        配置默认的执行器.
+        SIMPLE 就是普通执行器
+        REUSE 执行器会重用预处理语句(prepared statements)
+        BATCH 执行器将重用语句并执行批量更新
+        -->
+        <setting name="defaultExecutorType" value="REUSE"/>
+        <!-- 指定 MyBatis 所用日志的具体实现 -->
+        <setting name="logImpl" value="SLF4J"/>
+
+        <!-- 指定当结果集中值为 null 的时候是否调用映射对象的 setter（map 对象时为 put）方法，这对于有 Map.keySet() 依赖或 null 值初始化的时候是有用的。注意基本类型（int、boolean等）是不能设置成 null 的。 -->
+        <setting name="callSettersOnNulls" value="true"/>
+        <!-- 延迟加载的全局开关。当开启时，所有关联对象都会延迟加载。 特定关联关系中可通过设置fetchType属性来覆盖该项的开关状态。 -->
+        <setting name="lazyLoadingEnabled" value="false"/>
+        <!-- 当开启时，任何方法的调用都会加载该对象的所有属性。否则，每个属性会按需加载（参考lazyLoadTriggerMethods). -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 是否开启自动驼峰命名规则（camel case）映射，即从经典数据库列名 A_COLUMN 到经典 Java 属性名 aColumn 的类似映射。 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+            <property name="helperDialect" value="mysql"/>
+            <property name="reasonable" value="false"/>
+
+            <!--可以在方法传参支持分页了-->
+            <property name="supportMethodsArguments" value="true"/>
+            <property name="params" value="pageNum=pageNumber;pageSize=pageSize;"/>
+        </plugin>
+        <plugin interceptor="com.alphaess.framework.core.mybatis.interceptor.SqlparserAddOrgIdInterceptor"></plugin>
+    </plugins>
+
+</configuration>

@@ -21,6 +21,7 @@
         <module>dynamic-sharding-router</module>
         <module>knife4j-study</module>
         <module>beanloader-starter-spring-boot</module>
+        <module>pageable-method-resolver-starter-spring-boot</module>
     </modules>
 
 
