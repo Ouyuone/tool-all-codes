@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8088
 
 management:
   prometheus:
@@ -11,13 +11,15 @@ management:
 #      prometheus:
 #        enabled: true
   server:
-    port: 8080 # 可选配置，如果不配置该 port，直接使用 ${server.port}
-  endpoints:
+    port: 8088 # 可选配置，如果不配置该 port，直接使用 ${server.port}
+  endpoint:
     health:
       enabled: true
+      show-details: always
+  endpoints:
     web:
       exposure:
-        include: 'prometheus' # 测试使用，开启了所有端点，生产环境不建议 *
+        include: '*'
 spring:
   application:
     name: hippo4j-server
