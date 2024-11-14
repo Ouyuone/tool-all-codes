@@ -24,6 +24,7 @@
         <module>pageable-method-resolver-starter-spring-boot</module>
         <module>spring-security-rbac</module>
         <module>hippo4j-study</module>
+        <module>dynamic-rest-caller</module>
     </modules>
 
 

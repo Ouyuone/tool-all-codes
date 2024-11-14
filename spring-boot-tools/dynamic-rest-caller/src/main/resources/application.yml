@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: dynamic-rest-caller
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+  use-management-port: false
+  use-javadoc: true
+
+
+
+http:
+  client:
+    type: APACHE  # 或者 OKHTTP
+    max-total: 100 # 连接池最大连接数
+    default-max-per-route: 20 # 每个路由的最大连接数
+    connect-timeout: 5000 # 连接超时时间（毫秒）
+    socket-timeout: 65000 # Socket 读取超时时间（毫秒）
+
+# 服务发现配置
+service-discovery:
+  type: simple  # 服务发现类型，可以是 'simple'、'nacos'、'zookeeper' 等
