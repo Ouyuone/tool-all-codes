@@ -10,6 +10,7 @@
 
   <modules>
     <module>cglib-bean</module>
+    <module>bean-copier</module>
   </modules>
 
   <properties>
