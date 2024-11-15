@@ -6,10 +6,13 @@ import cc.ackman.multi.level.domain.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:yu.ou@alpha-ess.com">ouyu</a>
@@ -35,9 +38,21 @@ public class MultiLevelTest {
         Mockito.doNothing().when(userRepository).deleteById(1L);
         userService.deleteUser(1L);
         
-        
+        AtomicInteger count = new AtomicInteger(0);
         //添加缓存
-        Mockito.doReturn(Optional.of(user)).when(userRepository).findById(1L);
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                if (count.getAndAdd(1) == 0) {
+                    return Optional.of(user);
+                }
+                User user = new User();
+                user.setId(1L);
+                user.setEmail("mock-email1");
+                user.setName("mock-name1");
+                return Optional.of(user);
+            }
+        }).when(userRepository).findById(1L);
         Optional<User> userOpt = userService.getUserById(1L);
         
         //从缓存中获取user

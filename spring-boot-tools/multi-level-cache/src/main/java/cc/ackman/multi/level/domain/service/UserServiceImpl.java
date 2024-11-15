@@ -2,6 +2,7 @@ package cc.ackman.multi.level.domain.service;
 
 import cc.ackman.multi.level.domain.entity.User;
 import cc.ackman.multi.level.domain.repository.UserRepository;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,7 +32,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "users", key = "#id")
+//    @CacheEvict(value="users",allEntries=true) //方法调用后清空所有缓存
+    //@CacheEvict(cacheNames = "users", key = "#id",beforeInvocation=true)//会在方法调用前清除缓存数据
+    @CacheEvict(cacheNames = "users", key = "#id",beforeInvocation=false)//会在方法调用后清除缓存数据
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
