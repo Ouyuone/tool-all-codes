@@ -1,0 +1,23 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 60000
+      client-type: lettuce
+  cache:
+    type: redis
+
+cache:
+  caffeine:
+    expiration: 3600  # 1 hour
+    max-size: 10000
+  redis:
+    expiration: 7200  # 2 hours
+
+logging:
+  level:
+    root: INFO
+    cc.ackman.multi: DEBUG

@@ -25,6 +25,7 @@
         <module>spring-security-rbac</module>
         <module>hippo4j-study</module>
         <module>dynamic-rest-caller</module>
+        <module>multi-level-cache</module>
     </modules>
 
 
