@@ -11,6 +11,7 @@
   <modules>
     <module>cglib-bean</module>
     <module>bean-copier</module>
+    <module>dynamic-priority-executors</module>
   </modules>
 
   <properties>
