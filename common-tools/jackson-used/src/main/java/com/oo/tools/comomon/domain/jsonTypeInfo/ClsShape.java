@@ -1,4 +1,4 @@
-package com.oo.tools.comomon.domain.onlyJsonTypeInfo;
+package com.oo.tools.comomon.domain.jsonTypeInfo;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
