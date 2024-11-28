@@ -1,0 +1,49 @@
+# 服务器配置
+server:
+  port: 8080  # 设置API网关的运行端口
+
+# Spring Cloud Gateway配置
+spring:
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
+    gateway:
+      routes:
+        # Service A 路由配置
+        - id: service-a  # 路由唯一标识符
+          uri: http://localhost:8081  # Service A的目标URI
+          predicates:
+            - Path=/service-a/**  # 匹配以/service-a/开头的请求路径
+          filters:
+            - RewritePath=/service-a/(?<segment>.*), /${segment}  # 重写路径，移除/service-a前缀
+            - name: CircuitBreaker  # 应用断路器
+              args:
+                name: service-a  # 断路器名称
+                fallbackUri: forward:/fallback  # 失败时转发到的URI
+
+        # Service B 路由配置
+        - id: service-b  # 路由唯一标识符
+          uri: http://localhost:8082  # Service B的目标URI
+          predicates:
+            - Path=/service-b/**  # 匹配以/service-b/开头的请求路径
+          filters:
+            - RewritePath=/service-b/(?<segment>.*), /${segment}  # 重写路径，移除/service-b前缀
+            - name: CircuitBreaker  # 应用断路器
+              args:
+                name: service-b  # 断路器名称
+                fallbackUri: forward:/fallback  # 失败时转发到的URI
+
+# Resilience4j断路器全局配置
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 10  # 滑动窗口大小，用于计算失败率
+      failureRateThreshold: 50  # 失败率阈值，超过此值将打开断路器（百分比）
+      waitDurationInOpenState: 10000  # 断路器打开状态的等待时间（毫秒）
+      permittedNumberOfCallsInHalfOpenState: 3  # 半开状态下允许的调用次数
+#      recordExceptions:
+#        - java.lang.Exception
+#  instances:
+#    service-a:
+#      baseConfig: default
