@@ -13,6 +13,7 @@
     <module>bean-copier</module>
     <module>dynamic-priority-executors</module>
     <module>publish-package</module>
+      <module>jackson-used</module>
   </modules>
 
   <properties>
