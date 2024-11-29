@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: consul-study-server
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: # consul 注册中心
+        instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+        service-name: ${spring.application.name}
+        prefer-ip-address: true #优先使用服务ip进行注册
+        health-check-critical-timeout: 10s #健康检查超时时间
+        fail-fast: false #是否启动快速失败
+        acl-token: "cd76a0f7-5535-40cc-8696-073462acc6c7"
+      config: # consul 配置中心
+        enabled: true
+        default-context: ${spring.application.name}
+        profile-separator: '-' # 环境分隔符 默认是, 假如启动的环境是dev那读取的目录就是 config/consul-study-server-dev下面的application
+        format: YAML
+        data-key: application # 配置文件名 需要创建默认环境的目录是config/consul-study-server下面的application
+        watch:
+          enabled: true
+          delay: 1000
+        prefixes: config
+        acl-token: "cd76a0f7-5535-40cc-8696-073462acc6c7"
+      scheme: http
+      enabled: true
+  config:
+    import: optional:consul:${spring.cloud.consul.host}:${spring.cloud.consul.port}

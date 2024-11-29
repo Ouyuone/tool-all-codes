@@ -1,0 +1,17 @@
+{
+  "datacenter": "consul-micro-service",
+  "log_level": "INFO",
+  "node_name": "consul-service-registry",
+  "server": true,
+  "ui": true,
+  "data_dir":"/consul/data",
+  "client_addr":"0.0.0.0",
+  "acl": {
+    "enabled": true,
+    "default_policy": "deny",
+    "enable_token_persistence": true,
+    "tokens":{
+      "master":"cd76a0f7-5535-40cc-8696-073462acc6c7"
+    }
+  }
+}

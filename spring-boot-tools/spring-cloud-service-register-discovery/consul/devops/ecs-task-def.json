@@ -1,0 +1,50 @@
+{
+  "executionRoleArn": "%executionRoleArn%",
+  "containerDefinitions": [
+    {
+      "portMappings": [
+        {
+          "protocol": "tcp",
+          "containerPort": 8500
+        }
+      ],
+      "image": "%image%",
+      "name": "%containerName%",
+      "mountPoints": [
+        {
+          "sourceVolume": "consul",
+          "containerPath": "/consul/data"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/%taskName%",
+          "awslogs-region": "ap-southeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "%profile%"
+        }
+      ]
+    }
+  ],
+  "memory": "1024",
+  "family": "%taskName%",
+  "volumes": [
+    {
+      "name": "consul",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-001806b69492f77c0"
+      }
+    }
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc",
+  "cpu": "512"
+}

@@ -27,6 +27,8 @@
         <module>dynamic-rest-caller</module>
         <module>multi-level-cache</module>
         <module>spring-cloud-resilience4j-demo</module>
+        <module>spring-cloud-service-register-discovery</module>
+        <module>spring-cloud-service-register-discovery/consul</module>
     </modules>
 
 

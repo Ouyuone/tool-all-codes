@@ -1,0 +1,82 @@
+#!groovy
+
+node {
+
+    def repositoryUrl = 'git@bitbucket.org:client_solutions/eureka-service-registry.git'
+    def dockerImageName = '024231900798.dkr.ecr.ap-southeast-2.amazonaws.com/eb/eb-service-registry'
+    def dockerImageNameWithTag = ''
+    def containerName = 'eb-service-registry'
+    def serviceName = 'eb-service-registry'
+    def taskName = 'eb-service-registry-task-def'
+    def regionId = 'ap-southeast-2'
+    def clusterName = 'eb'
+    def taskDefFilePath = "${WORKSPACE}/ecs-task-def.json".toString()
+    def springProfile = 'dev'
+    def awsCredentialsId = 'aws-test-cli'
+    def executionRoleArn = 'arn:aws:iam::024231900798:role/ecsTaskExecutionRole'
+    // if env.TAG_NAME is null represent current change is branch else is tag change , branch change is Develop Test Environment
+    // tag change is production
+    def isDevelopTestEnvironment = env.TAG_NAME == null
+    echo "log isDevelopTestEnvironment value: " + isDevelopTestEnvironment
+
+    if (BRANCH_NAME == 'master') {
+        //skip  master branch auto build ， master branch use tag build
+        return
+    }
+
+    stage('check out code ') {
+        def gitPullName
+        if (isDevelopTestEnvironment) {
+            //develop branch or staging branch build
+            clusterName = clusterName + "-test"
+            springProfile = 'test'
+            gitPullName = BRANCH_NAME
+
+
+        } else {
+            //production tag build
+            awsCredentialsId = 'aws-prod-cli'
+            clusterName = clusterName + "-production"
+            springProfile = 'prod'
+            executionRoleArn = 'arn:aws:iam::057339916971:role/ecsTaskExecutionRole'
+            gitPullName = "refs/tags/${BRANCH_NAME}"
+        }
+        checkout scm: [$class           : 'GitSCM',
+                       userRemoteConfigs: [[url: "${repositoryUrl}", credentialsId: 'bitbucket']],
+                       branches         : [[name: "${gitPullName}"]]],
+                poll: false
+    }
+    
+    stage('docker build') {
+        if (isDevelopTestEnvironment) {
+            dockerImageNameWithTag = dockerImageName + ':test' + "-${BUILD_NUMBER}"
+        } else {
+            dockerImageName = "057339916971.dkr.ecr.ap-southeast-2.amazonaws.com/eb/eb-service-registry"
+            dockerImageNameWithTag = dockerImageName + ":${BRANCH_NAME}"
+        }
+        sh "docker build -t " + "${dockerImageNameWithTag}" + " .;"
+    }
+    stage('docker push') {
+        withAWS(credentials: "${awsCredentialsId}", region: "${regionId}") {
+            sh "aws ecr get-login-password --region ${regionId}" + "| docker login --username AWS --password-stdin " + "${dockerImageName}"
+            sh "docker push " + "${dockerImageNameWithTag}"
+        }
+    }
+    stage('update ecs task definition') {
+        taskName = clusterName + "_" + taskName
+        sh "sed  -i " + "'s|%image%|" + "${dockerImageNameWithTag}" + "|g'" + " ${WORKSPACE}/ecs-task-def.json"
+        sh "sed  -i " + "'s|%containerName%|" + "${containerName}" + "|g'" + " ${WORKSPACE}/ecs-task-def.json"
+        sh "sed  -i " + "'s|%taskName%|" + "${taskName}" + "|g'" + " ${WORKSPACE}/ecs-task-def.json"
+        sh "sed  -i " + "'s|%profile%|" + "${springProfile}" + "|g'" + " ${WORKSPACE}/ecs-task-def.json"
+        sh "sed  -i " + "'s|%executionRoleArn%|" + "${executionRoleArn}" + "|g'" + " ${WORKSPACE}/ecs-task-def.json"
+        withAWS(credentials: "${awsCredentialsId}", region: regionId) {
+            sh "aws ecs register-task-definition --family ${taskName} --cli-input-json  file:///${taskDefFilePath} --region ${regionId}"
+            sh "aws ecs update-service --cluster ${clusterName} --region ${regionId} --service ${serviceName} --task-definition ${taskName}"
+        }
+
+    }
+    stage('delete build log') {
+        properties([[$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '3']]])
+    }
+
+}
