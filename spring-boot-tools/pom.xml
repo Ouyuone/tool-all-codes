@@ -29,6 +29,7 @@
         <module>spring-cloud-resilience4j-demo</module>
         <module>spring-cloud-service-register-discovery</module>
         <module>spring-cloud-service-register-discovery/consul</module>
+        <module>spring-cloud-service-register-discovery/nacos</module>
     </modules>
 
 

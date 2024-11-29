@@ -1,0 +1,21 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    nacos:
+      config:
+        group: ${spring.profiles.active:DEFAULT_GROUP}
+        server-addr: 127.0.0.1:8848
+        namespace: 9bceb1b1-78b2-4cb5-86e3-a772c443930f # nacos命名空间
+
+      discovery:
+        server-addr: 127.0.0.1:8848
+        group: ${spring.profiles.active:DEFAULT_GROUP}
+        namespace: 9bceb1b1-78b2-4cb5-86e3-a772c443930f # nacos命名空间
+        service: ${spring.application.name}
+
+  config:
+    import:
+      - nacos:energy-consume.yml?refresh=true # 配置文件
+  application:
+    name: nacos-study-server
