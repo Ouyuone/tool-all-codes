@@ -31,6 +31,8 @@
         <module>spring-cloud-service-register-discovery/consul</module>
         <module>spring-cloud-service-register-discovery/nacos</module>
         <module>spring-boot-life-cycle</module>
+        <module>netty</module>
+        <module>enum-conveter</module>
     </modules>
 
 
