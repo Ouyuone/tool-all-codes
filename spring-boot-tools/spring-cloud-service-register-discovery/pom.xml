@@ -19,6 +19,7 @@
 
     <modules>
         <module>consul</module>
+        <module>nacos</module>
     </modules>
     <dependencies>
         <dependency>

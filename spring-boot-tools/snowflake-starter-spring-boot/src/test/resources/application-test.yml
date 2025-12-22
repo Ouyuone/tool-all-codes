@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: snowflake-starter-test
+
+snowflake:
+  enabled: true
+  prefix: "test"
+  redis-host: localhost
+  redis-port: 6379
+  redis-database: 0
+  # Snowflake ID 生成器实例配置
+  instances:
+    # 设备ID生成器实例配置
+    device:
+      # 数据中心ID，范围：0-31
+      data-center-id: 0
+      # 起始时间戳（epoch时间戳，毫秒），用于计算时间差
+      epoch-timestamp: 1672531200000
+      # 是否优化获取时间戳，开启后可提升性能
+      optimize-get-timestamp: true
+      # 时间偏移量（毫秒），用于时钟回拨保护
+      time-offset: 1000
+      # 随机序列号上限，用于提升并发性能
+      random-sequence-limit: 10
+    # 用户ID生成器实例配置
+    user:
+      # 数据中心ID，范围：0-31
+      data-center-id: 0
+      # 起始时间戳（epoch时间戳，毫秒），用于计算时间差
+      epoch-timestamp: 1672531200000
+
