@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oo.tools.spring.boot.repository.UserInfoRepository">
+    <!-- SQL 映射语句 -->
+
+    <select id="findPageQuery" resultType="com.oo.tools.spring.boot.entity.UserInfoEntity">
+        select * from user_info where deleted = 0
+    </select>
+
+    <select id="findPageQueryByParam" resultType="com.oo.tools.spring.boot.entity.UserInfoEntity">
+        select * from user_info where deleted = 0
+    </select>
+
+    <select id="findPageQueryReturnPage" resultType="com.oo.tools.spring.boot.entity.UserInfoEntity">
+        select * from user_info where deleted = 0
+    </select>
+
+</mapper>

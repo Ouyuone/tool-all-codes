@@ -32,6 +32,7 @@
         <module>netty</module>
         <module>enum-conveter</module>
         <module>snowflake-starter-spring-boot</module>
+        <module>mybatis-plus-study</module>
     </modules>
 
 
