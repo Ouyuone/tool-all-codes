@@ -1,0 +1,46 @@
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+
+dataSources:
+  master_ds:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/spring-boot-tools?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password:
+  slave_ds1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/spring-boot-tools?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password:
+  slave_ds2:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/spring-boot-tools?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password:
+
+rules:
+  - !READWRITE_SPLITTING
+    dataSourceGroups:
+      readwrite_ds:
+        writeDataSourceName: master_ds
+        readDataSourceNames:
+          - slave_ds1
+          - slave_ds2
+        transactionalReadQueryStrategy: PRIMARY
+        loadBalancerName: round
+    loadBalancers:
+      round:
+        type: ROUND
+  - !SINGLE
+    defaultDataSource: readwrite_ds  # 指定默认数据源为读写分离的数据源组
+    tables:
+      - "*.*"  # 声明所有数据库的所有表，让 ShardingSphere 识别已存在的表
+
+props:
+  sql-show: true   # 控制台打印实际路由 SQL，方便验证
+#  check-table-metadata-enabled: false   # 关闭元数据校验

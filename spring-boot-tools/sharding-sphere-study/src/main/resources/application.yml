@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Sharding-JDBC-Demo
+  datasource:
+    # 用 ShardingSphere 提供的 Driver 即可
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:shard.yaml   # 指向下面那份 YAML
+    username: root
+    password:
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.oo.tools.spring.boot.entity
+
